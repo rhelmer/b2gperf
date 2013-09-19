@@ -93,6 +93,7 @@ class DatazillaPerfPoster(object):
             'host': datazilla_config['host'],
             'project': datazilla_config['project'],
             'branch': datazilla_config['branch'],
+            'test suite': datazilla_config['test_suite'],
             'oauth key': datazilla_config['oauth_key'],
             'oauth secret': datazilla_config['oauth_secret'],
             'machine name': mac_address or 'unknown',
@@ -111,7 +112,8 @@ class DatazillaPerfPoster(object):
     def post_to_datazilla(self, results, app_name):
         # Prepare DataZilla results
         res = dzclient.DatazillaResult()
-        test_suite = app_name.replace(' ', '_').lower()
+        test_suite = self.required.get('test suite',
+            app_name.replace(' ', '_').lower())
         res.add_testsuite(test_suite)
         for metric in results.keys():
             res.add_test_results(test_suite, metric, results[metric])
@@ -498,6 +500,11 @@ class dzOptionParser(OptionParser):
                         dest='datazilla_branch',
                         metavar='str',
                         help='datazilla branch name')
+        self.add_option('--dz-test-suite',
+                        action='store',
+                        dest='datazilla_test_suite',
+                        metavar='str',
+                        help='datazilla test suite name')
         self.add_option('--dz-key',
                         action='store',
                         dest='datazilla_key',
@@ -525,6 +532,7 @@ class dzOptionParser(OptionParser):
             'host': datazilla_url.hostname,
             'project': options.datazilla_project,
             'branch': options.datazilla_branch,
+            'test_suite': options.datazilla_test_suite,
             'oauth_key': options.datazilla_key,
             'oauth_secret': options.datazilla_secret}
         return datazilla_config
